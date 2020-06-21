@@ -117,7 +117,7 @@ CRP_Key         DCD     0xFFFFFFFF
                 ENDIF
 
 				AREA matrixDeclaration, DATA, READWRITE 
-matrix 			SPACE 4000
+matrix 			SPACE 32000
 
 				AREA arrayInitialization, DATA, READONLY 
 array          DCD 4, 30, 120, 340, 780,1554
@@ -137,16 +137,16 @@ Reset_Handler   PROC
             ;   BX      R0
 			LDR r0, =matrix 
 			LDR r1, =array 
-			MOV r2, #6
+			MOV r2, #5
 			BL initializeMatrix
 			
 			LDR r0, =matrix 
-			MOV r1, #6
+			MOV r1, #5
 			BL computeDifferences
 			
 			LDR r0, =matrix 
-			MOV r1, #6
-			MOV r2, #10   
+			MOV r1, #5
+			MOV r2, #10
 			BL getPolynomialValue
 
 stop        B stop
@@ -237,15 +237,20 @@ loop2
 		moveq R8,R7
 		addne R8,R7,#4
 		ldr R8,[R8]
-		addne R5,R8	
+		addsne R5,R8	
+		
+		bvs overflow
+		b nooverflow
+overflow  
 		; Overflow Check
         mov R4,#0x7FFFFFFF
 		cmp R5,R4
-		movgt r5,R4
-		mov R4,#0x80000000
-		cmp R5,R4
 		movlt r5,R4
 		
+		mov R4,#0x80000000
+		cmp R5,R4
+		movgt r5,R4
+nooverflow	
 		
 		add R6,R7,R11
 		str R5,[R6]
